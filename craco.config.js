@@ -12,7 +12,7 @@ module.exports = {
       plugin: CracoLessPlugin,
       options: {
         globalVars: {},
-        // modifyVars: { '@primary-color': '#1DA57A' },
+        // modifyVars: { '@primary-color': 'lightskyblue' },
         javascriptEnabled: true,
         // patterns: `@import "~@/assets/styles/variables.less";`
       }

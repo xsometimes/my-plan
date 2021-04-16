@@ -1,0 +1,40 @@
+@import '~@/assets/styles/variables.less';
+
+.weekly-report {
+  padding: 45px 0;
+  &-container {
+    display: table;
+
+    width: 100%;
+    border: 1px solid #fff;
+    background-color: @primary-color;
+    border-spacing: 2px;
+    .row {
+      display: table-row;
+      
+      &:not(.table-row-header) {
+        height: 160px;
+      }
+      .cell {
+        display: table-cell;
+        padding: 8px;
+
+        border: 1px solid #fff;
+        background-color: #fff;
+
+        &.table-col-header {
+          width: 75px;
+          vertical-align: middle;
+        }
+
+        &:nth-child(3) {
+          width: 200px;
+        }
+      }
+    }
+  }
+  &-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

@@ -1,19 +1,96 @@
+# 开发问题记录
+1. eventEmitter的缺陷：
+
+可能存在多个组件正在监听`Bus.on`同个事件，如在父组件中监听到列表中每个子组件的事件，这时候需要判断具体是哪个子组件，可通过id鉴别。
+
+对eventBus的选择，我是受到之前项目采用责任链设计模式的偏好影响，加之本项目比较简单。
+
+2. 使用div[contentEditable=true]的注意事项：光标容易错位。
+
+针对这个问题，应该避免减少组件的re-render。
+
+在本项目中，editGrid同时支持edit和view的功能，没有将这两者分页面处理，所以我只赋予div初始值（即，非受控组件），将用户每次输入改变的值emit到父组件中，useRef保存，这样就不会触发re-render了。
+
+```ts
+// 父组件TodoItem
+const Bus = React.bus
+
+const TodoItem = React.memo((props: TodoEntity) => {
+
+  const { id, content, checked: initialChecked } = props;
+
+  const todoRef = useRef(props)
+
+  useEffect(() => {
+    const handleValueChange = payload => {
+      const { value, editId } = payload
+      if (editId === id) {
+        // doSth()
+        todoRef.current = {
+          ...todoRef.current,
+          content: value,
+          id
+        }
+        Bus.emit(EventType.TODO_ITEM_CHANGE, todoRef.current)
+      }
+    }
+
+    Bus.on(EventType.GRID_VALUE_CHANGE, handleValueChange)
+
+    return () => {
+      Bus.off(EventType.GRID_VALUE_CHANGE, handleValueChange)
+    }
+  })
+
+  return <div className="todo-item">
+    <EditGrid initialVal={content} editId={id} />
+  </div>
+})
+
+export default TodoItem;
+```
 
 
-## 需求设计
-1、工作面板 dashboard
-- 右上角日历
+```ts
+// 子组件EditGrid
+const Bus = React.bus
 
-2、日todolist
+const EditGrid: React.FC<GridProps> = props => {
+  let { initialVal='', isLocked=false, editId='' } = props;
 
-3、周报复盘（本周小结、下周计划）
+  const handleInput = useCallback<React.ChangeEventHandler<HTMLInputElement>>(e => {
+    Bus.emit(EventType.GRID_VALUE_CHANGE, {
+      value: e.target.innerText,
+      editId
+    })
+  }, [editId])
+  
+  return <div
+    className="grid"
+    contentEditable={!isLocked}
+    dangerouslySetInnerHTML={{__html: initialVal}}
+    onInput={handleInput}
+    onBlur={submit}
+    ></div>
+}
+
+export default EditGrid;
+```
 
 
-4、月重点事件标记
 
-5、月总结（A本月最关键的事B学习计划C旅行计划D健康剑圣计划E理财计划）
 
-## 架构设计
-create-react-app单页面
 
-model管理 参考之前参与过的
+
+
+
+
+
+
+
+## 参考文档
+- [react 路由鉴权](https://juejin.cn/post/6844903924441284615)
+- [使用 React Hooks 结合 EventEmitter](https://segmentfault.com/a/1190000023469546)
+- [TypeScript 在 React 中干货分享](https://juejin.cn/post/6874831839224299528)
+- [display:table布局总结](https://www.cnblogs.com/mengff/p/7711662.html)
+

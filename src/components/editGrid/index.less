@@ -1,0 +1,21 @@
+@import '~@/assets/styles/variables.less';
+.grid {
+  min-width: 120px;
+  &:focus {
+    outline: unset;
+  }
+  &-line-through {
+    text-decoration: line-through;
+  }
+
+  &[contenteditable=true] {
+    user-modify: read-write-plaintext-only;
+    -webkit-user-modify: read-write-plaintext-only;
+    -moz-user-modify: read-write-plaintext-only;
+    &:empty:before {
+      content: attr(placeholder);
+      display: inline;
+      color: @placeholder-color;
+    }
+  }
+}
